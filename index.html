@@ -140,9 +140,9 @@ footer{margin-top:40px;padding-top:22px;border-top:1px solid var(--hair);font-si
       </section>
 
       <section>
-        <h2>用 GPX 推算</h2>
-        <p>號碼貼掉了、沒有晶片成績時用。取軌跡上離每個感應點最近的那一筆當通過時間。檔案只在這台裝置上讀，不會上傳。</p>
-        <input type="file" id="gpxFile" accept=".gpx,application/gpx+xml,text/xml,application/xml" aria-label="選擇 GPX 檔">
+        <h2>用 GPX 或 FIT 推算</h2>
+        <p>號碼貼掉了、沒有晶片成績時用。車錶的 FIT 原始檔或匯出的 GPX 都可以。取軌跡上離每個感應點最近的那一筆當通過時間。檔案只在這台裝置上讀，不會上傳。</p>
+        <input type="file" id="gpxFile" accept=".gpx,.fit,application/gpx+xml,text/xml,application/xml,application/octet-stream" aria-label="選擇 GPX 或 FIT 檔">
         <p class="status" id="gpxStatus" role="status"></p>
       </section>
 
@@ -672,7 +672,7 @@ function search(){
     var ch=Array.from(q), a=ch[0], z=ch[ch.length-1];
     hits=data.filter(function(r){ var m=Array.from(r.n); return m[0]===a&&(ch.length===1||m[m.length-1]===z); });
   }
-  if(!hits.length){ var p=document.createElement("p"); p.className="hint"; p.textContent="找不到。號碼貼掉了的話，往下用 GPX 推算。"; box.appendChild(p); return; }
+  if(!hits.length){ var p=document.createElement("p"); p.className="hint"; p.textContent="找不到。號碼貼掉了的話，往下用 GPX 或 FIT 推算。"; box.appendChild(p); return; }
   hits.slice(0,8).forEach(function(r){
     var b=document.createElement("button"); b.type="button"; b.className="hit";
     [[String(r.b),"span","n"],[r.n,"span",""],[r.g,"small",""],[r.c[n-1]!=null?fmtT(r.c[n-1]):"未完賽","small",""]].forEach(function(t){ var s=document.createElement(t[1]); if(t[2]) s.className=t[2]; s.textContent=t[0]; b.appendChild(s); });
@@ -683,49 +683,102 @@ function search(){
 }
 $("q").addEventListener("input",search);
 
-/* ---------- GPX ---------- */
+/* ---------- GPX／FIT ---------- */
 function hav(a,b,c,d){
   var R=6371,r=Math.PI/180,x=(d-b)*r*Math.cos((a+c)/2*r),y=(c-a)*r;
   return Math.sqrt(x*x+y*y)*R;
 }
 function say(msg,err){ var el=$("gpxStatus"); el.textContent=msg; el.className="status"+(err?" err":""); }
+
+function parseGPX(text){
+  var doc=new DOMParser().parseFromString(text,"application/xml");
+  var nodes=doc.getElementsByTagName("trkpt"), pts=[], i;
+  for(i=0;i<nodes.length;i++){
+    var tn=nodes[i].getElementsByTagName("time")[0];
+    if(!tn) continue;
+    var t=Date.parse(tn.textContent);
+    if(isNaN(t)) continue;
+    pts.push([parseFloat(nodes[i].getAttribute("lat")),parseFloat(nodes[i].getAttribute("lon")),t/1000]);
+  }
+  return pts;
+}
+
+/* FIT：只解 record 訊息（全域編號 20）裡的時間、緯度、經度，其他一律跳過 */
+function parseFIT(buf){
+  var dv=new DataView(buf), n=dv.byteLength;
+  if(n<14) throw new Error("too short");
+  var hs=dv.getUint8(0);
+  if(String.fromCharCode(dv.getUint8(8),dv.getUint8(9),dv.getUint8(10),dv.getUint8(11))!==".FIT") throw new Error("not fit");
+  var end=Math.min(n,hs+dv.getUint32(4,true)), pos=hs, defs={}, pts=[], lastTs=null, SEMI=180/2147483648, EPOCH=631065600;
+  while(pos<end){
+    var h=dv.getUint8(pos++), compressed=(h&0x80)!==0, local, tsOffset=null;
+    if(compressed){ local=(h>>5)&3; tsOffset=h&31; }
+    else{
+      local=h&15;
+      if(h&0x40){
+        var little=dv.getUint8(pos+1)===0, global=dv.getUint16(pos+2,little), nf=dv.getUint8(pos+4), k, fields=[], size=0;
+        pos+=5;
+        for(k=0;k<nf;k++){ fields.push([dv.getUint8(pos),dv.getUint8(pos+1),size]); size+=dv.getUint8(pos+1); pos+=3; }
+        if(h&0x20){ var nd=dv.getUint8(pos++); for(k=0;k<nd;k++){ size+=dv.getUint8(pos+1); pos+=3; } }
+        defs[local]={little:little,global:global,fields:fields,size:size};
+        continue;
+      }
+    }
+    var d=defs[local];
+    if(!d) throw new Error("bad record");
+    if(pos+d.size>n) break;
+    var ts=null, lat=null, lon=null, f;
+    for(f=0;f<d.fields.length;f++){
+      var num=d.fields[f][0], sz=d.fields[f][1], at=pos+d.fields[f][2];
+      if(sz!==4) continue;
+      if(num===253){ var v=dv.getUint32(at,d.little); if(v!==0xFFFFFFFF) ts=v; }
+      else if(d.global===20&&num===0){ var a=dv.getInt32(at,d.little); if(a!==0x7FFFFFFF) lat=a*SEMI; }
+      else if(d.global===20&&num===1){ var b=dv.getInt32(at,d.little); if(b!==0x7FFFFFFF) lon=b*SEMI; }
+    }
+    if(ts!=null) lastTs=ts;
+    else if(tsOffset!=null&&lastTs!=null){
+      ts=(lastTs&~31)+tsOffset; if(tsOffset<(lastTs&31)) ts+=32; lastTs=ts;
+    }
+    if(d.global===20&&ts!=null&&lat!=null&&lon!=null) pts.push([lat,lon,ts+EPOCH]);
+    pos+=d.size;
+  }
+  return pts;
+}
+
+function applyTrack(pts,kind){
+  var ev=EV(), st=ST(), i;
+  if(pts.length<50){ say(kind==="FIT"?"這份 FIT 裡沒有帶座標的紀錄點。確認它是戶外騎乘的活動檔。":"這份 GPX 沒有帶時間的軌跡點。請用車錶或 Strava 匯出的原始活動檔。",true); return; }
+  var from=0, idxs=[], far=[];
+  ev.cps.forEach(function(cp){
+    var best=-1,bd=1e9;
+    for(var j=from;j<pts.length;j++){ var dd=hav(cp.at[0],cp.at[1],pts[j][0],pts[j][1]); if(dd<bd){bd=dd;best=j;} }
+    idxs.push(best); if(bd>3) far.push(cp.km+"K");
+    if(best>=0) from=best;
+  });
+  var s0=0;
+  for(i=0;i<idxs[0];i++){ if(hav(ev.startPt[0],ev.startPt[1],pts[i][0],pts[i][1])<0.25) s0=i; }
+  var t0=pts[s0][2];
+  idxs.forEach(function(ix,k){ st.cum[k]=fmtT(pts[ix][2]-t0); });
+  var loc=new Date(t0*1000+8*3600*1000);
+  st.start=pad(loc.getUTCHours())+":"+pad(loc.getUTCMinutes());
+  st.official=false; st.touched=true;
+  buildForm(); persist(); render();
+  say(far.length?("已推算，但軌跡離 "+far.join("、")+" 的估計位置超過 3 公里，這幾點請自己核對。"):"已依 "+kind+" 推算各點時間（"+pts.length+" 個紀錄點），名次也重排了。",far.length>0);
+}
+
 $("gpxFile").addEventListener("change",function(e){
   var f=e.target.files&&e.target.files[0]; if(!f) return;
   say("讀取中…");
   var rd=new FileReader();
   rd.onerror=function(){ say("檔案讀不出來，換一份再試。",true); };
   rd.onload=function(){
+    var buf=rd.result, u8=new Uint8Array(buf), isFit=u8.length>12&&u8[8]===46&&u8[9]===70&&u8[10]===73&&u8[11]===84;
     try{
-      var ev=EV(), st=ST();
-      var doc=new DOMParser().parseFromString(String(rd.result),"application/xml");
-      var nodes=doc.getElementsByTagName("trkpt"), pts=[], i;
-      for(i=0;i<nodes.length;i++){
-        var tn=nodes[i].getElementsByTagName("time")[0];
-        if(!tn) continue;
-        var t=Date.parse(tn.textContent);
-        if(isNaN(t)) continue;
-        pts.push([parseFloat(nodes[i].getAttribute("lat")),parseFloat(nodes[i].getAttribute("lon")),t/1000]);
-      }
-      if(pts.length<50){ say("這份 GPX 沒有帶時間的軌跡點。請用車錶或 Strava 匯出的原始活動檔。",true); return; }
-      var from=0, idxs=[], far=[];
-      ev.cps.forEach(function(cp){
-        var best=-1,bd=1e9;
-        for(var j=from;j<pts.length;j++){ var dd=hav(cp.at[0],cp.at[1],pts[j][0],pts[j][1]); if(dd<bd){bd=dd;best=j;} }
-        idxs.push(best); if(bd>3) far.push(cp.km+"K");
-        if(best>=0) from=best;
-      });
-      var s0=0;
-      for(i=0;i<idxs[0];i++){ if(hav(ev.startPt[0],ev.startPt[1],pts[i][0],pts[i][1])<0.25) s0=i; }
-      var t0=pts[s0][2];
-      idxs.forEach(function(ix,k){ st.cum[k]=fmtT(pts[ix][2]-t0); });
-      var loc=new Date(t0*1000+8*3600*1000);
-      st.start=pad(loc.getUTCHours())+":"+pad(loc.getUTCMinutes());
-      st.official=false; st.touched=true;
-      buildForm(); persist(); render();
-      say(far.length?("已推算，但軌跡離 "+far.join("、")+" 的估計位置超過 3 公里，這幾點請自己核對。"):"已依 GPX 推算各點時間，名次也重排了。",far.length>0);
-    }catch(err){ say("這份檔案解析失敗，確認它是 GPX 格式。",true); }
+      if(isFit) applyTrack(parseFIT(buf),"FIT");
+      else applyTrack(parseGPX(new TextDecoder("utf-8").decode(u8)),"GPX");
+    }catch(err){ say(isFit?"這份 FIT 檔解析失敗，可能檔案不完整。":"這份檔案解析失敗，確認它是 GPX 或 FIT 格式。",true); }
   };
-  rd.readAsText(f);
+  rd.readAsArrayBuffer(f);
 });
 
 /* ---------- 下載 ---------- */
