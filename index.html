@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TBA 完騎證書</title>
+<meta name="description" content="2026 TBA 四極燈塔 620、一日雙塔 520、一日北高 360 的非官方完騎證書產生器。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 跟證書同一套語言：夜空藏青、紙白的字、晨昏色帶當分隔、細線取代框。左證書右工具，手機疊成一欄。 */
+  --night:#0b1030;
+  --deep:#101742;
+  --ink:#f4efe4;
+  --mute:#9aa3c4;
+  --hair:rgba(244,239,228,.26);
+  --seal:#d8402f;
+  --f-display:"Noto Serif TC","Noto Serif CJK TC","Songti TC",serif;
+  --f-num:"Bodoni Moda","Didot","Bodoni 72","Noto Serif TC",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{background:var(--night)}
+body{background:linear-gradient(180deg,var(--night),var(--deep) 45%,var(--night));min-height:100vh;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:16px;line-height:1.75;-webkit-text-size-adjust:100%}
+a{color:var(--ink)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px 72px}
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px 40px;padding:44px 0 26px}
+.brand{display:flex;flex-direction:column;gap:2px}
+.eyebrow{font-size:13px;letter-spacing:.5em;color:var(--mute)}
+h1{font-weight:900;font-size:44px;letter-spacing:.32em;line-height:1.25;margin:0;text-wrap:balance}
+.sub{font-family:var(--f-num);font-style:italic;font-size:18px;color:var(--mute);letter-spacing:.04em}
+nav.events{display:flex;flex-wrap:wrap;gap:6px 28px}
+nav.events a{text-decoration:none;color:var(--mute);padding:6px 0;border-bottom:1px solid transparent;letter-spacing:.16em;white-space:nowrap}
+nav.events a b{font-family:var(--f-num);font-weight:600;font-size:1.15em;letter-spacing:.02em;margin-left:.35em}
+nav.events a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+nav.events a:hover{color:var(--ink)}
+/* 晨昏色帶 */
+.horizon{height:34px;margin:0 -20px;background:linear-gradient(180deg,rgba(11,16,48,0),#3a2f6e 22%,#b3507a 40%,#f58f5a 56%,#fbd08c 70%,#b3507a 84%,rgba(16,23,66,0))}
+.grid{display:grid;grid-template-columns:minmax(0,540px) minmax(0,1fr);gap:48px;align-items:start;padding-top:40px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr);gap:36px}h1{font-size:34px}}
+.stage{display:flex;flex-direction:column;gap:16px;position:sticky;top:20px}
+@media (max-width:900px){.stage{position:static}}
+#certImg{display:block;width:100%;height:auto;aspect-ratio:1240/1754;background:#0d1236;box-shadow:0 0 0 1px var(--hair),0 26px 70px rgba(0,0,0,.55)}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--ink);color:#0d1a36;border:1px solid var(--ink);padding:10px 26px;font-weight:700;letter-spacing:.3em;text-indent:.3em}
+.btn:hover{background:#fff}
+.hint{font-size:13px;color:var(--mute);margin:0;letter-spacing:.04em}
+.side{display:flex;flex-direction:column}
+section{padding:26px 0;border-top:1px solid var(--hair);display:flex;flex-direction:column;gap:16px}
+section:first-child{border-top:0;padding-top:0}
+h2{font-size:13px;font-weight:500;letter-spacing:.6em;color:var(--mute);margin:0}
+section p{margin:0;font-size:14px;color:var(--mute);max-width:36em}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 24px}
+.field{display:flex;flex-direction:column;gap:2px;min-width:0}
+.field span{font-size:12px;color:var(--mute);letter-spacing:.14em}
+input[type=text],input[type=search],select{width:100%;background:transparent;border:0;border-bottom:1px solid var(--hair);border-radius:0;color:var(--ink);padding:6px 0;font:inherit;font-size:18px;min-width:0;-webkit-appearance:none;appearance:none}
+input.num{font-family:var(--f-num);font-size:20px;letter-spacing:.03em}
+input::placeholder{color:rgba(154,163,196,.55)}
+select option{color:#111}
+input:focus,select:focus{outline:0;border-bottom-color:var(--ink)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+input[type=file]{font:inherit;font-size:14px;color:var(--mute);max-width:100%}
+.hits{display:flex;flex-direction:column}
+.hit{display:grid;grid-template-columns:4.4em minmax(0,1fr) auto auto;gap:14px;align-items:baseline;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--hair);color:var(--ink);padding:10px 0}
+.hit:hover{background:rgba(244,239,228,.06)}
+.hit .n{font-family:var(--f-num);font-size:19px}
+.hit small{color:var(--mute);font-family:var(--f-num);font-size:15px}
+.cps{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 22px;align-items:baseline}
+.cps .k{white-space:nowrap}
+.cps .k b{font-family:var(--f-num);font-weight:600;font-size:19px;margin-right:.6em}
+.cps .k small{color:var(--mute);font-size:13px;letter-spacing:.1em}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;white-space:nowrap}
+th,td{text-align:right;padding:8px 0 8px 18px;border-bottom:1px solid var(--hair);font-family:var(--f-num);font-size:17px}
+th{color:var(--mute);font-family:var(--f-display);font-weight:500;font-size:12px;letter-spacing:.3em}
+th:first-child,td:first-child{text-align:left;padding-left:0}
+td:first-child{font-family:var(--f-display);font-size:14px}
+td:first-child b{font-family:var(--f-num);font-weight:600;font-size:17px;margin-right:.6em}
+.status{font-size:13px;min-height:1.5em;margin:0;color:var(--ink)}
+.status.err{color:#ff9d8a}
+footer{margin-top:40px;padding-top:22px;border-top:1px solid var(--hair);font-size:12px;color:var(--mute);letter-spacing:.08em}
+@media (prefers-reduced-motion:no-preference){nav.events a,.btn,.hit{transition:color .15s,background .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">2026 TBA</div>
+      <h1>完騎證書</h1>
+      <div class="sub">Certificate of Completion</div>
+    </div>
+    <nav class="events" aria-label="賽事">
+      <a href="#e620" data-ev="620">四極燈塔<b>620</b></a>
+      <a href="#e520" data-ev="520">一日雙塔<b>520</b></a>
+      <a href="#e360" data-ev="360">一日北高<b>360</b></a>
+    </nav>
+  </header>
+  <div class="horizon" aria-hidden="true"></div>
+
+  <div class="grid">
+    <div class="stage">
+      <img id="certImg" alt="完騎證書預覽">
+      <div class="bar">
+        <button class="btn" id="saveBtn" type="button">下載</button>
+        <p class="hint" id="saveHint">A4、300 dpi。手機長按圖片也能存。</p>
+      </div>
+    </div>
+
+    <div class="side">
+      <section>
+        <h2>查成績</h2>
+        <p id="dataInfo">成績資料載入中…</p>
+        <input type="search" id="q" placeholder="號碼，或姓名的第一個和最後一個字" autocomplete="off" aria-label="用號碼或姓名查成績">
+        <div class="hits" id="hits"></div>
+      </section>
+
+      <section>
+        <h2>證書上的字</h2>
+        <div class="fields">
+          <label class="field"><span>姓名</span><input type="text" id="fName" placeholder="你的名字" autocomplete="off"></label>
+          <label class="field"><span>號碼（可不填）</span><input type="text" class="num" id="fBib" inputmode="numeric" autocomplete="off"></label>
+          <label class="field"><span>組別</span><select id="fGroup"></select></label>
+          <label class="field"><span>出發時刻</span><input type="text" class="num" id="fStart" autocomplete="off"></label>
+          <label class="field"><span>名次跟誰比</span><select id="fPool"><option value="all">全部完賽者</option><option value="full">只算每點都有感應的</option></select></label>
+        </div>
+        <p>公開成績的姓名遮了中間字，要自己補上。</p>
+      </section>
+
+      <section>
+        <h2>各點時間</h2>
+        <p>累計時間，時:分:秒。自己改過就視為自填成績，名次的分母會多算你一個。</p>
+        <div class="cps" id="cpGrid"></div>
+      </section>
+
+      <section>
+        <h2>分段紀錄</h2>
+        <div class="tw"><table><thead><tr><th>區間</th><th>累計</th><th>該段</th><th>km/h</th><th>排名</th></tr></thead><tbody id="segBody"></tbody></table></div>
+      </section>
+
+      <section>
+        <h2>用 GPX 推算</h2>
+        <p>號碼貼掉了、沒有晶片成績時用。取軌跡上離每個感應點最近的那一筆當通過時間。檔案只在這台裝置上讀，不會上傳。</p>
+        <input type="file" id="gpxFile" accept=".gpx,application/gpx+xml,text/xml,application/xml" aria-label="選擇 GPX 檔">
+        <p class="status" id="gpxStatus" role="status"></p>
+      </section>
+
+      <section>
+        <h2>說明</h2>
+        <p>這是車友自己做的紀念證書，不是主辦單位發的。成績取自 <a href="https://irunner.biji.co/track/1581/real-time-ranking">iRunner 公開成績</a>（擷取於 2026-11-17），姓名照公開慣例遮住中間字。名次是這頁依晶片時間自己排的，正式成績以主辦單位公告為準。</p>
+        <p>證書由上到下就是這趟路：位置對應緯度，顏色是你騎到那裡時的天色，所以每個人的都不一樣。燈塔只有在你夜裡經過時才亮。</p>
+        <p>分段排名只比兩端都有感應紀錄的人，均速超過 50 km/h 的分段視為感應異常不列入。GPX 推算用的感應點座標是估的，可能差幾分鐘。大字的逐筆字形來自 GlyphWiki，以 KAGE 引擎產生。</p>
+      </section>
+    </div>
+  </div>
+  <footer>非官方 · 與中華民國自行車協會、iRunner 無關</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- 地理 ---------- */
+var ROUTE=[[25.02,121.945],[25.10,121.91],[25.125,121.915],[25.14,121.80],[25.155,121.75],[25.205,121.69],[25.225,121.645],[25.29,121.57],[25.295,121.537],[25.26,121.46],[25.18,121.42],[25.15,121.40],[25.12,121.30],[25.11,121.24],[25.04,121.08],[24.91,120.98],[24.85,120.93],[24.77,120.91],[24.62,120.76],[24.44,120.65],[24.37,120.58],[24.27,120.53],[24.07,120.42],[23.97,120.33],[23.80,120.22],[23.70,120.20],[23.46,120.16],[23.38,120.15],[23.21,120.10],[23.10,120.04],[23.00,120.16],[22.88,120.20],[22.61,120.29],[22.46,120.45],[22.36,120.60],[22.19,120.69],[22.07,120.71],[21.92,120.735],[21.955,120.77],[21.905,120.853]];
+var EAST=[[21.99,120.87],[22.19,120.89],[22.34,120.90],[22.61,121.01],[22.75,121.16],[23.10,121.38],[23.32,121.46],[23.60,121.53],[23.98,121.62],[24.30,121.76],[24.45,121.80],[24.59,121.87],[24.86,121.83],[24.97,121.93],[25.008,122.002]];
+var SUNRISE=6.15, SUNSET=17.13;
+var P={hsinchu:[24.775,120.915],wanggong:[23.968,120.325],budai:[23.38,120.165],donggang:[22.468,120.46]};
+
+/* ---------- 三場賽事 ---------- */
+var EVENTS={
+  "620":{name:"四極燈塔",km:620,from:"福隆",to:"鵝鑾鼻",startDay:13,start:"20:00",file:"results-620.json",
+    big:[["四","極"],["燈","塔"]],seal:["四","極","完","騎"],route:[0,39],
+    startPt:[25.0159,121.9447],
+    cps:[{km:75,name:"富貴角",at:[25.2983,121.5367]},{km:185,name:"新竹香山",at:P.hsinchu},{km:305,name:"王功",at:P.wanggong},{km:383,name:"布袋",at:P.budai},{km:425,name:"國聖港",at:[23.10,120.05]},{km:525,name:"東港",at:P.donggang},{km:615,name:"鵝鑾鼻",at:[21.905,120.85]}],
+    marks:[{id:"E",kind:"tower",name:"三貂角燈塔",at:[25.008,122.002],dir:0,cp:-1},{id:"N",kind:"tower",name:"富貴角燈塔",at:[25.298,121.537],dir:-90,cp:0},{id:"W",kind:"tower",name:"國聖港燈塔",at:[23.10,120.035],dir:180,cp:4},{id:"S",kind:"tower",name:"鵝鑾鼻燈塔",at:[21.902,120.853],dir:90,cp:6}]},
+  "520":{name:"一日雙塔",km:520,from:"富貴角",to:"鵝鑾鼻",startDay:14,start:"00:00",file:"results-520.json",
+    big:[["一","日"],["雙","塔"]],seal:["雙","塔","完","騎"],route:[8,39],
+    startPt:[25.293,121.535],
+    cps:[{km:107,name:"新竹香山",at:P.hsinchu},{km:227,name:"王功",at:P.wanggong},{km:301,name:"布袋",at:P.budai},{km:430,name:"東港",at:P.donggang},{km:515,name:"鵝鑾鼻",at:[21.905,120.85]}],
+    marks:[{id:"N",kind:"tower",name:"富貴角燈塔",at:[25.298,121.537],dir:-90,cp:-1},{id:"S",kind:"tower",name:"鵝鑾鼻燈塔",at:[21.902,120.853],dir:90,cp:4}]},
+  "360":{name:"一日北高",km:360,from:"八里",to:"高雄",startDay:13,start:"23:00",file:"results-360.json",
+    big:[["一","日"],["北","高"]],seal:["北","高","完","騎"],route:[11,32],routeEnd:[22.682,120.292],
+    startPt:[25.137,121.406],
+    cps:[{km:71,name:"新竹香山",at:P.hsinchu},{km:190,name:"王功",at:P.wanggong},{km:267,name:"布袋",at:P.budai},{km:360,name:"高雄左營",at:[22.682,120.292]}],
+    /* 北高沒有燈塔：起終點是兩座城，畫成一圈城市的燈 */
+    marks:[{id:"A",kind:"city",name:"八里",at:[25.15,121.40],cp:-1},{id:"B",kind:"city",name:"高雄左營",at:[22.682,120.292],cp:3}]}
+};
+var ORDER=["620","520","360"];
+
+/* 大字的逐筆明體外框：GlyphWiki 字形資料經 KAGE 引擎展開，200 單位字框 */
+var KG={"四":[[[[40,35.2],[40,177],[18,188],[18,24.2]]],[[[29,35.2],[171,35.2],[171,38.8],[29,38.8]]],[[[182,37],[182,171],[160,182],[160,37]],[[160,35.2],[171,30.2],[187,38.8],[182,48],[160,37]]],[[[89.5,35.2],[89.5,62],[68.5,62],[68.5,35.2]],[[68.5,62],[72.7,68.3],[79,72.5],[85.3,68.3],[89.5,62]],[[89.5,62],[88.5,72.5],[86.5,82.5],[83.7,91.9],[79.9,100.6],[75.2,108.6],[69.5,115.8],[63,122.2],[55.7,127.6],[47.6,132],[38.7,135.3],[37.2,132.6],[43.9,126.5],[49.7,120.4],[54.7,114.3],[58.9,107.9],[62.2,101.3],[64.9,94.3],[66.8,86.9],[68.1,79.1],[68.6,70.8],[68.5,62]]],[[[128.5,35.2],[128.5,107],[107.5,107],[107.5,35.2]],[[107.5,107],[111.7,113.3],[118,117.5],[124.3,113.3],[128.5,107]],[[128.5,107],[128.5,107.7],[128.5,108],[128.5,107.9],[128.3,107.5],[127.9,107],[127.4,106.6],[127,106.4],[126.9,106.4],[127.2,106.4],[128,106.5],[128,127.5],[124.9,127.3],[121.8,126.7],[118.7,125.7],[115.7,124.1],[113,121.9],[110.8,119.2],[109.2,116.2],[108.2,113.1],[107.6,110],[107.5,107]],[[128,106.5],[135.3,109.6],[138.5,117],[135.3,124.3],[128,127.5]],[[128,106.5],[153,106.5],[153,127.5],[128,127.5]],[[153,106.5],[159.3,110.7],[163.5,117],[159.3,123.3],[153,127.5]]],[[[29,161.2],[171,161.2],[171,164.8],[29,164.8]]]],"極":[[[[12,59.2],[76,59.2],[76,62.8],[12,62.8]],[[76,59.2],[51.3,61],[63.6,48.6]]],[[[55.5,15.9],[55.5,179.7],[34.5,190.2],[34.5,14.1]],[[55.5,15.9],[60.7,17.7],[53.5,20.5]]],[[[54.2,61],[53.8,62.7],[51.4,72.7],[48.7,82.4],[45.7,91.8],[42.3,100.9],[38.5,109.8],[34.4,118.4],[29.9,126.6],[25,134.5],[19.4,141.9],[13.4,148.8],[10.5,147.1],[13.4,138.6],[16.1,130.1],[18.9,121.7],[21.5,113.2],[23.9,104.6],[26,95.8],[27.9,86.9],[29.6,77.9],[31,68.6],[31.8,61]]],[[[48.5,84.9],[51.8,85.9],[55.4,86.3],[58.8,87.1],[62,88.1],[65.1,89.3],[68.1,90.8],[70.9,92.4],[73.6,94.2],[76.2,96.3],[78.6,98.6],[59.7,109.9],[59.4,108.1],[59,106.2],[58.3,104.2],[57.4,102.1],[56.3,99.9],[54.9,97.6],[53.3,95.2],[51.6,92.7],[49.6,89.9],[47,87.8]],[[78.6,98.6],[79.7,106.9],[74.8,113.7],[66.5,114.8],[59.7,109.9]]],[[[67,29.2],[182,29.2],[182,32.8],[67,32.8]],[[182,29.2],[157.3,31],[169.6,18.6]]],[[[121.3,30],[113.3,61],[90.6,61],[98.6,30]]],[[[103,57.2],[131,57.2],[131,60.8],[103,60.8]]],[[[93.5,89.2],[93.5,144],[74.5,153.5],[74.5,79.7]]],[[[84,89.2],[109,89.2],[109,92.8],[84,92.8]]],[[[119,91],[119,137.8],[99,137.8],[99,91]],[[109,137.8],[119,130.6],[129,134.2],[129,137.8]],[[99,89.2],[109,84.2],[124,92.8],[119,101],[99,91]]],[[[84,134.2],[109,134.2],[109,137.8],[84,137.8]]],[[[139,75.2],[172,75.2],[172,78.8],[139,78.8]]],[[[183,78.5],[180.5,89.8],[177.6,100.6],[174.3,110.8],[170.6,120.5],[166.4,129.6],[161.8,138.1],[156.7,146],[151.1,153.2],[144.9,159.6],[138.2,165],[135.7,162.9],[139.4,155.4],[142.9,147.9],[146.2,140.2],[149.2,132.2],[152,123.8],[154.5,115],[156.6,105.8],[158.5,96.1],[160,86],[161.2,75.4]],[[161,75.2],[172,70.2],[188,78.8],[183,87],[161,92]]],[[[140.8,76.7],[147.1,82.4],[152.8,88.5],[157.9,95],[162.6,101.6],[166.9,108.5],[170.7,115.6],[174.3,122.8],[177.4,130.1],[180.2,137.6],[182.6,145.3],[161,149.9],[160,142.9],[158.6,136],[156.9,129],[155,122],[152.7,115.1],[150.2,108],[147.4,100.9],[144.4,93.7],[141.3,86.3],[138.2,78.7]],[[182.6,145.3],[180.9,153.5],[174.1,158.3],[165.9,156.7],[161,149.9]]],[[[63,174.2],[187,174.2],[187,177.8],[63,177.8]],[[187,174.2],[162.3,176],[174.6,163.6]]],[[[141.9,58.7],[142.2,75.1],[142.3,90.1],[142.1,103.7],[141.6,116],[140.9,126.8],[140,136.4],[138.7,144.7],[137.1,151.8],[135,158],[131.8,163.7],[114.3,150.3],[114.8,149.3],[115.9,146],[117.1,140.7],[118.1,133.7],[119,125.1],[119.7,114.9],[120.1,103.2],[120.3,90],[120.2,75.3],[120,59.2]],[[120,57.2],[131,52.2],[147,60.8],[142,69],[120,74]],[[131.8,163.7],[129.9,165.9],[127.9,167.9],[125.7,169.8],[123.4,171.4],[120.8,172.8],[118.2,174],[115.5,174.9],[112.7,175.5],[109.8,175.8],[107,176],[107,154],[108,153.9],[108.9,153.8],[109.7,153.6],[110.4,153.4],[111.1,153.1],[111.7,152.8],[112.3,152.3],[112.9,151.8],[113.6,151.1],[114.3,150.3]],[[107,165],[107,154],[99.3,154],[99.3,159.5]]]],"燈":[[[[15.8,49.9],[18.9,52.7],[21.9,55.7],[24.6,59],[27.1,62.7],[29.3,66.6],[31.3,70.8],[33.1,75.1],[34.7,79.7],[36.1,84.4],[37.3,89.3],[15.4,91.6],[15.6,87.3],[15.6,83],[15.5,78.9],[15.3,74.9],[15.1,70.9],[14.7,67],[14.3,63.2],[13.9,59.3],[13.6,55.4],[13,51.6]],[[37.3,89.3],[34.8,97.3],[27.5,101.4],[19.5,98.9],[15.4,91.6]]],[[[81,57.3],[78.3,60.6],[75.4,63.8],[72.3,67.1],[69.1,70.3],[65.6,73.6],[61.9,76.9],[57.9,80.1],[53.7,83.2],[49,86.2],[44.1,89.1],[41.8,86.8],[44.3,81.8],[46.7,77],[49.1,72.5],[51.4,68.3],[53.6,64.2],[55.6,60.3],[57.5,56.5],[59.2,52.9],[60.7,49.5],[62,46.1]],[[61.5,47],[81,57.3],[62.5,45.3]],[[81,57.3],[84.8,61.6],[76.9,60.3]]],[[[54,18.9],[54,95],[32,95],[32,17.1]],[[54,18.9],[59.5,20.7],[52,23.5]],[[32,95],[36.4,101.6],[43,106],[49.6,101.6],[54,95]],[[54,95],[53,107.8],[51.4,119.9],[49,131.2],[45.9,141.8],[42,151.6],[37.3,160.6],[31.9,168.7],[25.7,175.7],[18.7,181.6],[11,186.2],[8.9,183.7],[13.7,176.8],[17.9,169.7],[21.6,162.4],[24.8,154.6],[27.4,146.3],[29.4,137.4],[30.9,127.8],[31.9,117.6],[32.2,106.6],[32,95]]],[[[44.8,120.5],[49.3,123.5],[53.7,126.3],[57.7,129.4],[61.3,132.5],[64.6,135.7],[67.6,138.9],[70.4,142.2],[72.8,145.6],[75,149],[76.9,152.5],[55.8,158.8],[55.7,156.4],[55.2,153.7],[54.5,150.7],[53.6,147.4],[52.3,143.9],[50.8,140.2],[49,136.2],[47,132],[44.9,127.4],[42.4,122.7]],[[76.9,152.5],[76,160.8],[69.5,166.2],[61.2,165.3],[55.8,158.8]]],[[[78,23.2],[115,23.2],[115,26.8],[78,26.8]]],[[[125.9,27.7],[122.5,37],[118.4,45.7],[113.5,54],[108,61.6],[101.8,68.6],[94.9,75.1],[87.3,80.8],[79.1,85.9],[70.2,90.1],[60.7,93.4],[59.2,90.5],[66.6,84.2],[73.3,77.9],[79.5,71.7],[85,65.3],[89.8,58.8],[93.9,52],[97.5,45],[100.4,37.7],[102.8,30.1],[104.5,22.2]],[[104,23.2],[115,18.2],[131,26.8],[126,35],[104,40]]],[[[76.6,34],[79.1,35],[82,35.4],[84.8,36.1],[87.5,37],[90.1,38.2],[92.7,39.6],[95.1,41.2],[97.4,43],[99.6,45.1],[101.6,47.3],[81.7,56.6],[81.7,54.9],[81.6,53.2],[81.4,51.3],[81,49.4],[80.5,47.5],[79.8,45.4],[78.9,43.2],[77.9,41],[76.8,38.5],[74.9,36.8]],[[101.6,47.3],[101.9,55.7],[96.3,61.9],[87.9,62.2],[81.7,56.6]]],[[[171.4,28.7],[169.6,30.5],[167.6,32.4],[165.6,34.4],[163.3,36.4],[160.9,38.5],[158.3,40.6],[155.6,42.8],[152.5,45],[149.2,47.2],[146.3,49.9],[143.6,48],[145.3,44.4],[146.4,40.6],[147.4,37.1],[148.4,33.9],[149.3,30.8],[150,28],[150.7,25.4],[151.2,23],[151.5,20.8],[151.7,18.8]],[[151.3,19.7],[171.4,28.7],[152.2,17.9]],[[171.4,28.7],[175.5,32.7],[167.5,31.9]]],[[[133.8,19.4],[138.2,26.8],[142.5,33.8],[146.9,40.2],[151.5,46.3],[156.4,51.8],[161.6,56.9],[167.1,61.6],[173.1,66],[179.4,69.9],[186.1,73.5],[173.8,94.4],[166.2,88.8],[159.3,82.7],[153.1,76.2],[147.5,69.3],[142.6,62],[138.5,54.4],[135.1,46.3],[132.5,38],[131,29.3],[130.6,20.2]],[[173.8,94.4],[186.1,73.5],[194.2,78.3]]],[[[184.6,44.8],[182.6,46.4],[180.5,48],[178.2,49.8],[175.6,51.6],[172.9,53.4],[170,55.4],[166.9,57.4],[163.5,59.5],[159.7,61.5],[156.2,64.1],[153.7,61.8],[156,58.1],[157.7,54.2],[159.3,50.7],[160.8,47.4],[162.2,44.3],[163.4,41.5],[164.4,38.9],[165.3,36.6],[165.9,34.5],[166.3,32.6]],[[165.7,33.4],[184.6,44.8],[166.7,31.9]],[[184.6,44.8],[188.2,49.3],[180.4,47.5]]],[[[96,78.2],[156,78.2],[156,81.8],[96,81.8]],[[156,78.2],[131.3,80],[143.6,67.6]]],[[[101,99.2],[101,136],[79,147],[79,88.2]]],[[[90,99.2],[159,99.2],[159,102.8],[90,102.8]]],[[[170,101],[170,135.8],[148,135.8],[148,101]],[[159,135.8],[170,128.6],[181,132.2],[181,135.8]],[[148,99.2],[159,94.2],[175,102.8],[170,112],[148,101]]],[[[90,132.2],[159,132.2],[159,135.8],[90,135.8]]],[[[96.8,134.7],[100,137.2],[103.4,139.7],[106.4,142.6],[109.2,145.8],[111.7,149.1],[114.1,152.6],[116.3,156.3],[118.3,160.2],[120,164.2],[121.7,168.4],[100.1,172.7],[100,169.1],[99.7,165.6],[99.4,162],[99,158.5],[98.4,155],[97.7,151.4],[97,147.8],[96.2,144.2],[95.4,140.3],[94.2,136.7]],[[121.7,168.4],[119.9,176.6],[113,181.3],[104.8,179.6],[100.1,172.7]]],[[[165.6,139],[164,143.2],[162.2,147.4],[160.2,151.6],[157.9,155.7],[155.4,159.9],[152.6,164],[149.6,168.1],[146.2,172.1],[142.4,176],[138.4,179.8],[135.5,178.1],[136.9,172.8],[138,167.7],[139.3,162.9],[140.4,158.3],[141.4,154],[142.3,149.8],[143,145.7],[143.5,141.9],[143.8,138.2],[144,134.7]],[[143.8,135.7],[165.6,139],[144.3,133]],[[165.6,139],[170.6,141.8],[162.7,143.1]]],[[[66,177.2],[184,177.2],[184,180.8],[66,180.8]],[[184,177.2],[159.3,179],[171.6,166.6]]]],"塔":[[[[13,68.2],[74,68.2],[74,71.8],[13,71.8]],[[74,68.2],[49.3,70],[61.6,57.6]]],[[[54,18.9],[54,142.8],[32,142.8],[32,17.1]],[[54,18.9],[59.5,20.7],[52,23.5]]],[[[9.9,146.3],[14.7,145.1],[19.8,143.7],[25.3,142],[31.1,140.3],[37.2,138.3],[43.6,136.2],[50.4,134],[57.5,131.7],[65.1,129.5],[73.2,127.5],[74.7,130.4],[68.3,135.8],[61.9,140.5],[55.6,144.8],[49.5,148.8],[43.7,152.4],[38,155.8],[32.6,158.9],[27.4,161.8],[22.4,164.5],[17.7,166.9]],[[17.7,166.9],[9.9,146.3],[8.2,147]],[[17.7,166.9],[21.3,171.5],[20.8,159.9]]],[[[65,38.2],[126,38.2],[126,41.8],[65,41.8]],[[126,38.2],[101.3,40],[113.6,27.6]]],[[[96.9,12.7],[104.7,52.4],[85.2,67.5],[75,15.2]],[[96.9,12.7],[102.7,13.4],[95.6,16.1]]],[[[130,38.2],[184,38.2],[184,41.8],[130,41.8]],[[184,38.2],[159.3,40],[171.6,27.6]]],[[[166.7,17.5],[160.7,57.2],[137.2,64.7],[145.2,12.4]],[[166.7,17.5],[171.9,20.1],[164.2,21.2]]],[[[133.3,57.8],[128.1,66.3],[122.4,74.5],[116.3,82.3],[109.9,89.8],[103,97],[95.7,103.8],[88,110.2],[79.8,116.2],[71.1,121.5],[61.9,126.3],[60,123.6],[66.8,116.1],[73.3,108.8],[79.6,101.5],[85.6,94.2],[91.2,86.8],[96.5,79.3],[101.3,71.6],[105.8,63.8],[110,55.9],[113.7,47.7]],[[113.3,48.6],[133.3,57.8],[114.2,46.8]],[[133.3,57.8],[137.4,61.9],[129.5,60.9]]],[[[123.8,56.8],[131.1,63.5],[137.9,69.8],[144.4,75.9],[150.7,81.4],[157,86.5],[163.2,91],[169.3,95.1],[175.4,98.6],[181.4,101.6],[187.4,104.1],[176.5,125.8],[169.8,121.4],[163.3,116.5],[157,111.1],[150.9,105.2],[145.1,98.8],[139.6,91.9],[134.3,84.5],[129.4,76.5],[124.9,67.9],[121.1,58.6]],[[176.5,125.8],[187.4,104.1],[197.3,109.1]]],[[[91,109.2],[156,109.2],[156,112.8],[91,112.8]],[[156,109.2],[131.3,111],[143.6,98.6]]],[[[106,134.2],[106,182],[84,193],[84,123.2]]],[[[95,134.2],[152,134.2],[152,137.8],[95,137.8]]],[[[163,136],[163,174.8],[141,174.8],[141,136]],[[152,174.8],[163,167.6],[174,171.2],[174,174.8]],[[141,134.2],[152,129.2],[168,137.8],[163,147],[141,136]]],[[[95,171.2],[152,171.2],[152,174.8],[95,174.8]]]],"一":[[[[14,99.2],[186,99.2],[186,102.8],[14,102.8]],[[186,99.2],[161.3,101],[173.6,88.6]]]],"日":[[[[57,30.2],[57,182],[35,193],[35,19.2]]],[[[46,30.2],[154,30.2],[154,33.8],[46,33.8]]],[[[165,32],[165,176],[143,187],[143,32]],[[143,30.2],[154,25.2],[170,33.8],[165,43],[143,32]]],[[[46,96.2],[154,96.2],[154,99.8],[46,99.8]]],[[[46,166.2],[154,166.2],[154,169.8],[46,169.8]]]],"雙":[[[[55.8,19.9],[53,25],[49.9,30],[46.5,34.8],[42.7,39.6],[38.7,44.2],[34.3,48.6],[29.7,52.9],[24.6,57],[19.1,60.8],[13.1,64.1],[10.8,61.8],[14.1,55.9],[17.3,50.4],[20.5,45.2],[23.4,40.1],[26,35.1],[28.4,30.3],[30.6,25.5],[32.5,20.8],[34.1,16.2],[35.4,11.7]],[[35,12.6],[55.8,19.9],[35.9,10.5]],[[55.8,19.9],[60.3,23.6],[52.3,23.4]]],[[[43,39.2],[43,110],[23,120],[23,39.2]]],[[[58.7,18.2],[60.7,19.6],[63.2,20.1],[65.6,20.7],[67.8,21.5],[69.9,22.5],[72,23.6],[73.9,24.9],[75.7,26.4],[77.3,28.3],[78.8,30.6],[57.1,34.5],[58,34.5],[58.8,34],[59.3,33.2],[59.7,32],[59.8,30.5],[59.7,28.8],[59.4,26.9],[58.9,24.8],[58.2,22.4],[56.6,20.8]],[[78.8,30.6],[76.9,38.7],[69.9,43.4],[61.8,41.5],[57.1,34.5]]],[[[33,38.2],[100,38.2],[100,41.8],[33,41.8]],[[100,38.2],[75.3,40],[87.6,27.6]]],[[[74,38.2],[74,106.8],[54,106.8],[54,38.2]]],[[[33,59.2],[98,59.2],[98,62.8],[33,62.8]],[[98,59.2],[85.6,61],[91.8,52.7]]],[[[33,80.2],[98,80.2],[98,83.8],[33,83.8]],[[98,80.2],[77.4,82],[87.7,70.6]]],[[[33,103.2],[103,103.2],[103,106.8],[33,106.8]],[[103,103.2],[82.4,105],[92.7,93.6]]],[[[138.8,19.9],[136,25],[132.9,30],[129.5,34.8],[125.7,39.6],[121.7,44.2],[117.3,48.6],[112.7,52.9],[107.6,57],[102.1,60.8],[96.1,64.1],[93.8,61.8],[97.1,55.9],[100.3,50.4],[103.5,45.2],[106.4,40.1],[109,35.1],[111.4,30.3],[113.6,25.5],[115.5,20.8],[117.1,16.2],[118.4,11.7]],[[118,12.6],[138.8,19.9],[118.9,10.5]],[[138.8,19.9],[143.3,23.6],[135.3,23.4]]],[[[126,39.2],[126,110],[106,120],[106,39.2]]],[[[141.7,18.2],[143.7,19.5],[146.2,20],[148.6,20.7],[150.9,21.5],[153,22.4],[155,23.4],[157,24.6],[158.8,26.1],[160.5,27.7],[162.1,29.7],[140.9,35.5],[141.7,35.2],[142.3,34.5],[142.8,33.5],[143,32.2],[143,30.6],[142.8,28.9],[142.4,26.9],[141.9,24.8],[141.2,22.4],[139.6,20.8]],[[162.1,29.7],[161,38],[154.4,43.3],[146.1,42.1],[140.9,35.5]]],[[[116,38.2],[184,38.2],[184,41.8],[116,41.8]],[[184,38.2],[159.3,40],[171.6,27.6]]],[[[158,38.2],[158,106.8],[138,106.8],[138,38.2]]],[[[116,59.2],[182,59.2],[182,62.8],[116,62.8]],[[182,59.2],[161.4,61],[171.7,49.6]]],[[[116,80.2],[182,80.2],[182,83.8],[116,83.8]],[[182,80.2],[161.4,82],[171.7,70.6]]],[[[116,103.2],[187,103.2],[187,106.8],[116,106.8]],[[187,103.2],[166.4,105],[176.7,93.6]]],[[[42,124.2],[146,124.2],[146,127.8],[42,127.8]]],[[[154.2,133.2],[143.9,143.1],[132.9,152],[121,159.9],[108.3,166.8],[94.9,172.8],[80.8,177.7],[66,181.6],[50.4,184.5],[34.1,186.2],[17.1,186.6],[16.8,183.3],[33,179.3],[48.2,174.9],[62.6,170.1],[76,164.7],[88.5,158.6],[100,151.9],[110.7,144.6],[120.6,136.6],[129.5,128],[137.7,118.7]],[[135,124.2],[146,119.2],[162,127.8],[157,136],[135,141]]],[[[65.8,126.2],[71.8,133],[78.4,139.1],[85.9,144.5],[94.5,149.3],[104.4,153.7],[115.8,157.5],[128.6,160.7],[142.9,163.4],[158.8,165.4],[176.1,166.9],[173.8,191],[155.5,188.2],[138.6,184.6],[123.3,180.2],[109.4,175.1],[97.1,169.1],[86.5,162.4],[77.5,154.7],[70.3,146.3],[65.3,137.1],[62.8,127.4]],[[173.8,191],[176.1,166.9],[195.6,168.8]]]],"北":[[[[16,75.2],[77,75.2],[77,78.8],[16,78.8]]],[[[88,16.9],[88,156.8],[66,156.8],[66,15.1]],[[88,16.9],[93.5,18.7],[86,21.5]]],[[[13.7,165.1],[21.1,163.5],[28.8,161.8],[36.8,159.9],[45,158],[53.5,156],[62.2,154],[71.3,151.9],[80.6,149.8],[90.3,148],[100.4,146.4],[101.5,149.5],[92.6,154.6],[83.8,159.1],[75.2,163.3],[66.7,167.1],[58.4,170.8],[50.2,174.2],[42.4,177.5],[34.7,180.5],[27.2,183.5],[19.9,186.2]],[[19.9,186.2],[13.7,165.1],[12,165.7]],[[19.9,186.2],[23.2,191],[23.6,179.4]]],[[[121,75.2],[185,75.2],[185,78.8],[121,78.8]],[[185,75.2],[160.3,77],[172.6,64.6]]],[[[132,16.9],[132,160],[110,160],[110,15.1]],[[132,16.9],[137.5,18.7],[130,21.5]],[[110,160],[114.4,166.6],[121,171],[127.6,166.6],[132,160]],[[132,160],[132,160.6],[132,160.9],[132,160.7],[131.7,160.2],[131.2,159.7],[130.7,159.2],[130.2,158.9],[130,158.9],[130.3,158.9],[131,159],[131,181],[127.8,180.8],[124.7,180.2],[121.5,179.2],[118.4,177.5],[115.7,175.2],[113.4,172.5],[111.7,169.4],[110.7,166.2],[110.1,163.1],[110,160]],[[131,159],[138.7,162.3],[142,170],[138.7,177.7],[131,181]],[[131,159],[182,159],[182,181],[131,181]],[[182,159],[188.6,163.4],[193,170],[188.6,176.6],[182,181]],[[182,159],[184,134],[182,134],[171,159]]]],"高":[[[[84.6,11],[88.1,12.4],[91.8,13.2],[95.2,14.2],[98.4,15.4],[101.4,16.8],[104.2,18.4],[106.8,20.1],[109.3,22.1],[111.5,24.4],[113.5,27.1],[92.7,34.5],[93.2,33.6],[93.4,32.3],[93.3,30.7],[92.8,28.8],[92,26.7],[90.8,24.4],[89.4,21.9],[87.6,19.2],[85.6,16.2],[82.9,13.8]],[[113.5,27.1],[112.9,35.4],[106.8,41.1],[98.4,40.6],[92.7,34.5]]],[[[14,38.2],[186,38.2],[186,41.8],[14,41.8]],[[186,38.2],[161.3,40],[173.6,27.6]]],[[[70,57.2],[70,92],[48,103],[48,46.2]]],[[[59,57.2],[140,57.2],[140,60.8],[59,60.8]]],[[[151,59],[151,88.8],[129,88.8],[129,59]],[[140,88.8],[151,81.6],[162,85.2],[162,88.8]],[[129,57.2],[140,52.2],[156,60.8],[151,70],[129,59]]],[[[59,85.2],[140,85.2],[140,88.8],[59,88.8]]],[[[41.5,106.2],[41.5,180.7],[20.5,191.2],[20.5,95.7]]],[[[31,106.2],[169,106.2],[169,109.8],[31,109.8]]],[[[179.5,108],[179.5,172],[158.5,172],[158.5,108]],[[158.5,106.2],[169,101.2],[184.5,109.8],[179.5,118.5],[158.5,108]],[[158.5,172],[162.7,178.3],[169,182.5],[175.3,178.3],[179.5,172]],[[179.5,172],[179.3,174.9],[178.9,177.8],[178,180.7],[176.6,183.6],[174.7,186.4],[172.2,188.7],[169.3,190.5],[166.2,191.6],[163.2,192.3],[160.2,192.5],[160.2,171.5],[160.5,171.4],[160.5,171.5],[160,171.6],[159.4,172],[158.9,172.5],[158.5,173.1],[158.3,173.4],[158.3,173.3],[158.4,172.8],[158.5,172]],[[160.2,182],[160.2,171.5],[150.3,171.5],[150.3,176.7]]],[[[79.5,125.2],[79.5,171],[58.5,181.5],[58.5,114.7]]],[[[69,125.2],[130,125.2],[130,128.8],[69,128.8]]],[[[140.5,127],[140.5,158.8],[119.5,158.8],[119.5,127]],[[130,158.8],[140.5,151.6],[151,155.2],[151,158.8]],[[119.5,125.2],[130,120.2],[145.5,128.8],[140.5,137.5],[119.5,127]]],[[[69,155.2],[130,155.2],[130,158.8],[69,158.8]]]]};
+var SCALE=2;
+
+/* ---------- 狀態 ---------- */
+var KEY="tba-cert-v3";
+var state={ev:"620",name:"",per:{}};
+try{
+  var saved=JSON.parse(localStorage.getItem(KEY)||"null");
+  if(saved&&saved.per&&EVENTS[saved.ev]) state=saved;
+}catch(e){}
+ORDER.forEach(function(k){
+  var ev=EVENTS[k], p=state.per[k];
+  if(!p||!Array.isArray(p.cum)||p.cum.length!==ev.cps.length) state.per[k]={bib:"",group:"",start:ev.start,cum:ev.cps.map(function(){return "";}),official:false,pool:"all",touched:false};
+});
+function persist(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
+function EV(){ return EVENTS[state.ev]; }
+function ST(){ return state.per[state.ev]; }
+var DATA={};
+
+/* ---------- 工具 ---------- */
+function parseT(s){
+  if(!s) return NaN;
+  var p=String(s).trim().split(":").map(Number);
+  if(p.some(isNaN)) return NaN;
+  if(p.length===3) return p[0]*3600+p[1]*60+p[2];
+  if(p.length===2) return p[0]*3600+p[1]*60;
+  return NaN;
+}
+function pad(n){ return (n<10?"0":"")+n; }
+function fmtT(sec){
+  if(sec==null||!isFinite(sec)) return "—";
+  sec=Math.round(sec);
+  return pad(Math.floor(sec/3600))+":"+pad(Math.floor(sec%3600/60))+":"+pad(sec%60);
+}
+function clock(sec){
+  if(!isFinite(sec)) return {t:"--:--",d:0};
+  var m=Math.floor(sec/60);
+  return {t:pad(Math.floor(m/60)%24)+":"+pad(m%60), d:Math.floor(m/1440)};
+}
+function rankOf(v,arr,self){
+  var better=0,i;
+  for(i=0;i<arr.length;i++) if(arr[i]<v) better++;
+  return (better+1)+" / "+(arr.length+(self?0:1));
+}
+function segOK(a,b,km){ return a!=null&&b!=null&&b>a&&(km/((b-a)/3600))<=50; }
+
+function derive(){
+  var ev=EV(), st=ST(), data=DATA[state.ev], n=ev.cps.length;
+  var start=parseT(st.start); if(!isFinite(start)) start=parseT(ev.start);
+  var prevKm=0, prevT=0, rows=[], cum=st.cum.map(parseT);
+  ev.cps.forEach(function(cp,i){
+    var c=cum[i], seg=c-prevT;
+    rows.push({km:cp.km,prevKm:prevKm,name:cp.name,cum:c,seg:seg,
+      speed:(isFinite(seg)&&seg>0)?(cp.km-prevKm)/(seg/3600):NaN,
+      arr:clock(start+c), rank:"—"});
+    prevKm=cp.km; if(isFinite(c)) prevT=c;
+  });
+  var total=cum[n-1], ranks=["—","—","—"];
+  if(data&&isFinite(total)&&st.group){
+    var self=!!st.official, sex=st.group.charAt(0);
+    var fin=data.filter(function(r){ return r.c[n-1]!=null&&(st.pool!=="full"||r.c.indexOf(null)<0); });
+    ranks[0]=rankOf(total,fin.map(function(r){return r.c[n-1];}),self);
+    ranks[1]=rankOf(total,fin.filter(function(r){return r.g.charAt(0)===sex;}).map(function(r){return r.c[n-1];}),self);
+    ranks[2]=rankOf(total,fin.filter(function(r){return r.g===st.group;}).map(function(r){return r.c[n-1];}),self);
+    rows.forEach(function(row,i){
+      if(!isFinite(row.seg)||row.seg<=0) return;
+      var km=row.km-row.prevKm, pool=[];
+      data.forEach(function(r){ var a=i===0?0:r.c[i-1], b=r.c[i]; if(segOK(a,b,km)) pool.push(b-a); });
+      row.rank=rankOf(row.seg,pool,self&&km/(row.seg/3600)<=50).replace(/ /g,"");
+    });
+  }
+  return {start:start,rows:rows,total:total,ranks:ranks,avg:isFinite(total)&&total>0?ev.cps[n-1].km/(total/3600):NaN};
+}
+
+/* ---------- 天色 ---------- */
+var SKY=[[0,"#0a0f2c"],[4.6,"#101742"],[5.4,"#3a2f6e"],[5.9,"#b3507a"],[6.25,"#f58f5a"],[6.9,"#fbd08c"],[7.8,"#bfe3ea"],[10,"#8fcdea"],[13,"#7cc3ee"],[15.5,"#9ad0ea"],[16.4,"#fbd58e"],[17.0,"#f7934e"],[17.4,"#e2566a"],[17.9,"#6b3a82"],[18.6,"#1a1b52"],[20,"#0d1236"],[24,"#0a0f2c"]];
+function hex(c){ return [parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)]; }
+function skyRGB(h){
+  h=((h%24)+24)%24;
+  for(var i=1;i<SKY.length;i++){
+    if(h<=SKY[i][0]){
+      var a=SKY[i-1],b=SKY[i],t=(h-a[0])/(b[0]-a[0]||1),ca=hex(a[1]),cb=hex(b[1]);
+      return [ca[0]+(cb[0]-ca[0])*t,ca[1]+(cb[1]-ca[1])*t,ca[2]+(cb[2]-ca[2])*t];
+    }
+  }
+  return hex(SKY[0][1]);
+}
+function isNight(sec){ var h=((sec/3600)%24+24)%24; return h<SUNRISE||h>=SUNSET; }
+function lumOf(c){ return (0.2126*c[0]+0.7152*c[1]+0.0722*c[2])/255; }
+
+/* ---------- 繪製（A4，1240×1754 單位，輸出 ×2 = 300 dpi） ---------- */
+var W=1240,H=1754,ML=90,MR=1150;
+var FD='"Noto Serif TC","Noto Serif CJK TC","Songti TC",serif';
+var FB='"Bodoni Moda","Didot","Bodoni 72","Noto Serif TC",serif';
+var MAP={yN:300,ky:294.1,latN:25.3,cx:560};
+MAP.kx=MAP.ky*Math.cos(23.6*Math.PI/180);
+function px(lat,lon){ return [MAP.cx+(lon-121.0)*MAP.kx, MAP.yN+(MAP.latN-lat)*MAP.ky]; }
+
+function txt(c,s,x,y,font,color,align,ls){
+  c.font=font; c.fillStyle=color; c.textAlign=align||"left"; c.textBaseline="alphabetic";
+  var has=("letterSpacing" in c);
+  if(has) c.letterSpacing=ls||"0px";
+  var dx=0;
+  if(has&&ls){ if(align==="center") dx=parseFloat(ls)/2; else if(align==="right") dx=parseFloat(ls); }
+  c.fillText(s,x+dx,y);
+  if(has) c.letterSpacing="0px";
+}
+function widthOf(c,s,font,ls){
+  c.font=font; if("letterSpacing" in c) c.letterSpacing=ls||"0px";
+  var w=c.measureText(s).width; if("letterSpacing" in c) c.letterSpacing="0px"; return w;
+}
+function rng(seed){ return function(){ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; }; }
+function smooth(c,pts,closed){
+  var n=pts.length,i,p,q;
+  if(closed){
+    p=pts[n-1]; q=pts[0]; c.moveTo((p[0]+q[0])/2,(p[1]+q[1])/2);
+    for(i=0;i<n;i++){ p=pts[i]; q=pts[(i+1)%n]; c.quadraticCurveTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2); }
+  }else{
+    c.moveTo(pts[0][0],pts[0][1]);
+    for(i=1;i<n-1;i++){ p=pts[i]; q=pts[i+1]; c.quadraticCurveTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2); }
+    c.lineTo(pts[n-1][0],pts[n-1][1]);
+  }
+}
+
+/* 位置 ↔ 時刻 */
+function timeline(ev,d){
+  var a=[[0,d.start]], lastT=d.start, lastY=0;
+  var ys=px(ev.startPt[0],ev.startPt[1])[1], firstY=px(ev.cps[0].at[0],ev.cps[0].at[1])[1];
+  if(ys<firstY){ a.push([ys,d.start]); lastY=ys; }
+  d.rows.forEach(function(r,i){
+    if(!isFinite(r.cum)) return;
+    var t=d.start+r.cum, y=px(ev.cps[i].at[0],ev.cps[i].at[1])[1];
+    if(t<lastT||y<=lastY) return;
+    a.push([y,t]); lastT=t; lastY=y;
+  });
+  a.push([H,lastT]);
+  return a;
+}
+function tAt(tl,y){
+  for(var i=1;i<tl.length;i++){
+    if(y<=tl[i][0]){ var p=tl[i-1],q=tl[i]; return p[1]+(q[1]-p[1])*(y-p[0])/((q[0]-p[0])||1); }
+  }
+  return tl[tl.length-1][1];
+}
+function yAt(tl,t){
+  for(var i=1;i<tl.length;i++){
+    if(t<=tl[i][1]){ var p=tl[i-1],q=tl[i]; if(q[1]===p[1]) return p[0]; return p[0]+(q[0]-p[0])*(t-p[1])/(q[1]-p[1]); }
+  }
+  return null;
+}
+
+var grainTile=null;
+function grain(c){
+  if(!grainTile){
+    grainTile=document.createElement("canvas"); grainTile.width=grainTile.height=160;
+    var g=grainTile.getContext("2d"), im=g.createImageData(160,160), r=rng(77), i;
+    for(i=0;i<im.data.length;i+=4){ var v=r()<.5?0:255; im.data[i]=im.data[i+1]=im.data[i+2]=v; im.data[i+3]=Math.floor(r()*22); }
+    g.putImageData(im,0,0);
+  }
+  c.save(); c.fillStyle=c.createPattern(grainTile,"repeat"); c.fillRect(0,0,W,H); c.restore();
+}
+
+/* 真的高斯：在輸出解析度上對遮罩做三次方框模糊，不靠縮放也不靠濾鏡 */
+function boxPass(src,dst,w,h,r,horizontal){
+  var n=horizontal?w:h, m=horizontal?h:w, win=2*r+1, a, i, sum, step=horizontal?1:w;
+  for(a=0;a<m;a++){
+    var base=horizontal?a*w:a; sum=0;
+    for(i=-r;i<=r;i++){ sum+=src[base+Math.min(n-1,Math.max(0,i))*step]; }
+    for(i=0;i<n;i++){
+      dst[base+i*step]=sum/win;
+      sum+=src[base+Math.min(n-1,i+r+1)*step]-src[base+Math.max(0,i-r)*step];
+    }
+  }
+}
+
+function draw(c,ev,st,d){
+  var i, tl=timeline(ev,d), n=ev.cps.length, has=isFinite(d.total)&&d.total>0;
+
+  /* 天色與墨色：兩條直向漸層，墨色跟著底色的明暗換 */
+  var skyG=c.createLinearGradient(0,0,0,H), inkStops=[], lums=[];
+  for(var y=0;y<=H;y+=6){
+    var rgb=skyRGB(tAt(tl,y)/3600), L=lumOf(rgb), k=Math.max(0,Math.min(1,(L-0.5)/0.14));
+    skyG.addColorStop(y/H,"rgb("+Math.round(rgb[0])+","+Math.round(rgb[1])+","+Math.round(rgb[2])+")");
+    inkStops.push([y/H,Math.round(255+(13-255)*k),Math.round(255+(26-255)*k),Math.round(255+(54-255)*k)]);
+    lums.push(L);
+  }
+  var inkCache={};
+  function ink(a){
+    if(a==null) a=1;
+    a=Math.round(a*1000)/1000;
+    if(!inkCache[a]){
+      var g=c.createLinearGradient(0,0,0,H);
+      inkStops.forEach(function(s){ g.addColorStop(s[0],"rgba("+s[1]+","+s[2]+","+s[3]+","+a+")"); });
+      inkCache[a]=g;
+    }
+    return inkCache[a];
+  }
+  function lumAt(yy){ return lums[Math.max(0,Math.min(lums.length-1,Math.round(yy/6)))]; }
+
+  c.fillStyle=skyG; c.fillRect(0,0,W,H);
+
+  var coast=ROUTE.concat(EAST).map(function(q){ return px(q[0],q[1]); });
+  var rp=ROUTE.slice(ev.route[0],ev.route[1]+1); if(ev.routeEnd) rp[rp.length-1]=ev.routeEnd;
+  var route=rp.map(function(q){ return px(q[0],q[1]); });
+  var sc=clock(d.start), fin=clock(d.start+d.total);
+
+  /* 星 */
+  var r=rng(20261113);
+  for(i=0;i<620;i++){
+    var sx=r()*W, sy=r()*H, sz=0.5+r()*1.3, sa=0.25+r()*0.6;
+    if(lumAt(sy)<0.13){ c.fillStyle="rgba(255,255,255,"+sa.toFixed(2)+")"; c.beginPath(); c.arc(sx,sy,sz,0,Math.PI*2); c.fill(); }
+  }
+
+  /* 大字：直排在島的西北與東南外海，各有一部分伸到島底下。被島蓋住的裁掉，露出來的帶高斯柔焦與透明 */
+  (function(){
+    var COLS=[[340,[455,745]],[680,[905,1185]]], BS=290, bk=BS/200, SIG=7.5, OP=0.42;
+    COLS.forEach(function(col,ci){
+      var cxc=col[0], pad=Math.ceil(SIG*3.2), x0=Math.round(cxc-BS/2-pad), y0=Math.round(col[1][0]-BS/2-pad);
+      var wU=BS+2*pad, hU=(col[1][1]+BS/2+pad)-y0, w=Math.round(wU*SCALE), h=Math.round(hU*SCALE);
+      var off=document.createElement("canvas"); off.width=w; off.height=h;
+      var g=off.getContext("2d"); g.scale(SCALE,SCALE); g.translate(-x0,-y0); g.fillStyle="#fff"; g.strokeStyle="#fff"; g.lineJoin="round";
+      ev.big[ci].forEach(function(ch,bi){
+        var ox=cxc-BS/2, oy=col[1][bi]-BS/2, thin=(ch==="一");
+        (KG[ch]||[]).forEach(function(polys){ polys.forEach(function(pl){
+          g.beginPath(); pl.forEach(function(p,j){ var X=ox+p[0]*bk, Y=oy+p[1]*bk; if(j) g.lineTo(X,Y); else g.moveTo(X,Y); }); g.closePath(); g.fill();
+          if(thin){ g.lineWidth=9; g.stroke(); }   /* 「一」只有一筆細橫，補一點分量才不會糊到看不見 */
+        }); });
+      });
+      var im=g.getImageData(0,0,w,h), px4=im.data, A=new Float32Array(w*h), B=new Float32Array(w*h), q, j;
+      for(q=0;q<w*h;q++) A[q]=px4[q*4+3];
+      var rr=Math.max(1,Math.round((Math.sqrt(12*SIG*SCALE*SIG*SCALE/3+1)-1)/2));
+      for(q=0;q<3;q++){ boxPass(A,B,w,h,rr,true); boxPass(B,A,w,h,rr,false); }
+      for(j=0;j<h;j++){
+        var fy=(y0+j/SCALE)/6, cr=0, cg=0, cb=0, kk;
+        for(kk=-4;kk<=4;kk++){
+          var f=Math.max(0,Math.min(inkStops.length-1.001,fy+kk)), i0=Math.floor(f), tt=f-i0, s0=inkStops[i0], s1=inkStops[i0+1];
+          cr+=s0[1]+(s1[1]-s0[1])*tt; cg+=s0[2]+(s1[2]-s0[2])*tt; cb+=s0[3]+(s1[3]-s0[3])*tt;
+        }
+        cr/=9; cg/=9; cb/=9;
+        for(q=0;q<w;q++){ var o=(j*w+q)*4; px4[o]=cr; px4[o+1]=cg; px4[o+2]=cb; px4[o+3]=A[j*w+q]*OP; }
+      }
+      g.setTransform(1,0,0,1,0,0); g.putImageData(im,0,0);
+      c.save(); c.beginPath(); c.rect(0,0,W,H); smooth(c,coast,true); c.clip("evenodd");
+      c.drawImage(off,x0,y0,w/SCALE,h/SCALE); c.restore();
+    });
+  })();
+
+  /* 島 */
+  c.beginPath(); smooth(c,coast,true); c.fillStyle=ink(.07); c.fill();
+  c.strokeStyle=ink(.6); c.lineWidth=1.1; c.stroke();
+
+  /* 起終點與燈塔：夜裡經過的才亮 */
+  var onMark={};
+  ev.marks.forEach(function(m){
+    m._when=m.cp<0?d.start:(isFinite(d.rows[m.cp].cum)?d.start+d.rows[m.cp].cum:NaN);
+    m._lit=isFinite(m._when)&&isNight(m._when);
+    if(m.cp>=0) onMark[m.cp]=true;
+  });
+  ev.marks.forEach(function(m){
+    if(m.kind!=="tower"||!m._lit) return;
+    var o=px(m.at[0],m.at[1]), a=m.dir*Math.PI/180, len=(m.id==="N"||m.id==="S")?82:150, half=(m.id==="N"||m.id==="S"?15:13)*Math.PI/180;
+    var g=c.createLinearGradient(o[0],o[1],o[0]+Math.cos(a)*len,o[1]+Math.sin(a)*len);
+    g.addColorStop(0,"rgba(255,244,214,.6)"); g.addColorStop(.6,"rgba(255,244,214,.14)"); g.addColorStop(1,"rgba(255,244,214,0)");
+    c.fillStyle=g; c.beginPath(); c.moveTo(o[0],o[1]); c.arc(o[0],o[1],len,a-half,a+half); c.closePath(); c.fill();
+  });
+
+  /* 騎過的海岸 */
+  c.save(); c.lineCap="round"; c.lineJoin="round";
+  c.shadowColor="rgba(255,255,255,.75)"; c.shadowBlur=16;
+  c.strokeStyle=ink(1); c.lineWidth=4.5; c.beginPath(); smooth(c,route,false); c.stroke();
+  c.restore();
+
+  /* 一般感應點，標在島裡 */
+  ev.cps.forEach(function(cp,idx){
+    if(onMark[idx]) return;
+    var q=px(cp.at[0],cp.at[1]), rw=d.rows[idx];
+    c.beginPath(); c.arc(q[0],q[1],6,0,Math.PI*2); c.fillStyle=skyG; c.fill();
+    c.strokeStyle=ink(1); c.lineWidth=2.4; c.stroke();
+    txt(c,cp.name,q[0]+20,q[1]+4,"700 19px "+FD,ink(1),"left","2px");
+    txt(c,cp.km+"K"+(isFinite(rw.cum)?"  "+rw.arr.t:""),q[0]+20,q[1]+26,"500 17px "+FB,ink(.8),"left");
+  });
+
+  /* 起終點與燈塔的記號 */
+  ev.marks.forEach(function(m){
+    var o=px(m.at[0],m.at[1]), x=o[0], yy=o[1];
+    if(m.kind==="tower"){
+      c.fillStyle=ink(1);
+      c.beginPath(); c.moveTo(x-7,yy+24); c.lineTo(x+7,yy+24); c.lineTo(x+4,yy+6); c.lineTo(x-4,yy+6); c.closePath(); c.fill();
+      c.save();
+      if(m._lit){ c.shadowColor="rgba(255,236,180,1)"; c.shadowBlur=22; c.fillStyle="#fff3cf"; } else c.fillStyle=ink(1);
+      c.beginPath(); c.arc(x,yy,6,0,Math.PI*2); c.fill(); c.restore();
+    }else{
+      /* 城：外圈細環，裡面一點燈火 */
+      c.beginPath(); c.arc(x,yy,13,0,Math.PI*2); c.fillStyle=skyG; c.fill();
+      c.strokeStyle=ink(1); c.lineWidth=1.6; c.stroke();
+      c.save();
+      if(m._lit){ c.shadowColor="rgba(255,236,180,1)"; c.shadowBlur=20; c.fillStyle="#fff3cf"; } else c.fillStyle=ink(1);
+      c.beginPath(); c.arc(x,yy,5.5,0,Math.PI*2); c.fill(); c.restore();
+    }
+    var info=m.cp<0?("起點  "+sc.t):(ev.cps[m.cp].km+"K"+(isFinite(d.rows[m.cp].cum)?"  "+d.rows[m.cp].arr.t:""));
+    var lx,ly,al;
+    if(m.id==="N"){ lx=x-26; ly=yy-8; al="right"; }
+    else if(m.id==="E"){ lx=x+18; ly=yy+46; al="left"; }
+    else if(m.id==="W"){ lx=x-22; ly=yy+10; al="right"; }
+    else if(m.id==="S"){ lx=x-24; ly=yy+8; al="right"; }
+    else if(m.id==="A"){ lx=x+26; ly=yy-22; al="left"; }
+    else { lx=x-28; ly=yy+2; al="right"; }
+    txt(c,m.name,lx,ly,"900 22px "+FD,ink(1),al,"3px");
+    txt(c,info,lx,ly+25,"500 18px "+FB,ink(.85),al);
+  });
+
+  /* 時刻尺：刻在右邊框上，每一格一小時 */
+  if(has){
+    var RXF=W-44.5, h0=Math.ceil(d.start/3600), h1=Math.floor((d.start+d.total)/3600), lastLab=-99;
+    for(var hh=h0;hh<=h1;hh++){
+      var ty=yAt(tl,hh*3600); if(ty==null||ty<MAP.yN-0.5) continue;
+      var lab=(hh%2===0)&&(ty-lastLab>=30);
+      c.fillStyle=ink(lab?.9:.55); c.fillRect(RXF-(lab?18:9),ty,lab?18:9,1);
+      if(lab){ txt(c,pad(hh%24)+":00",RXF-26,ty+5,"500 14px "+FB,ink(.85),"right"); lastLab=ty; }
+    }
+  }
+
+  /* 抬頭 */
+  var HW=344, HL=MR-HW;
+  txt(c,"2026 TBA "+ev.name,MR,112,"500 16px "+FD,ink(.8),"right","9px");
+  var hf=58; while(widthOf(c,"完騎證書","900 "+hf+"px "+FD,"20px")>HW+20&&hf>40) hf-=2;
+  txt(c,"完騎證書",MR,196,"900 "+hf+"px "+FD,ink(1),"right","20px");
+  c.fillStyle=ink(.55); c.fillRect(HL,218,HW,1);
+  txt(c,"Certificate of Completion",HL,250,"italic 500 18px "+FB,ink(.8),"left","1px");
+  txt(c,ev.km+" KM",MR,250,"600 18px "+FB,ink(1),"right","3px");
+  txt(c,ev.from+" → "+ev.to,ML,112,"500 16px "+FD,ink(.8),"left","4px");
+
+  /* 落款區 */
+  txt(c,"茲證明",ML,1462,"500 17px "+FD,ink(.75),"left","10px");
+  var blank=!state.name, nm=state.name||"你的名字", ns=62, nw;
+  while((nw=widthOf(c,nm,"700 "+ns+"px "+FD,"8px"))>360&&ns>30) ns-=4;
+  txt(c,nm,ML-2,1560,"700 "+ns+"px "+FD,ink(blank?.3:1),"left","8px");
+  c.save(); c.translate(ML+nw+38,1536); c.rotate(-4*Math.PI/180); c.scale(.78,.78);
+  c.fillStyle="#d8402f"; c.beginPath(); if(c.roundRect) c.roundRect(-33,-33,66,66,6); else c.rect(-33,-33,66,66); c.fill();
+  var sf="900 25px "+FD;
+  txt(c,ev.seal[0],15,-6,sf,"#fff4e4","center"); txt(c,ev.seal[1],15,24,sf,"#fff4e4","center");
+  txt(c,ev.seal[2],-15,-6,sf,"#fff4e4","center"); txt(c,ev.seal[3],-15,24,sf,"#fff4e4","center");
+  c.restore();
+
+  /* 完騎時間：一行排開，時分秒各自對著一個小字 */
+  var T=has?Math.round(d.total):0, th=has?String(Math.floor(T/3600)):"--", tm=has?pad(Math.floor(T%3600/60)):"--", ts2=has?pad(T%60):"--";
+  (function(){
+    var tf, sz=110, gap=8, parts=[th,":",tm,":",ts2], ws, total, k2;
+    do{
+      sz-=4; tf="600 "+sz+"px "+FB; ws=parts.map(function(p){ return widthOf(c,p,tf); });
+      total=ws.reduce(function(a,b){ return a+b; },0)+gap*4;
+    }while(total>450&&sz>48);
+    txt(c,"完騎時間",MR,1462,"500 17px "+FD,ink(.75),"right","10px");
+    var x=MR-total, units=["時","","分","","秒"];
+    for(k2=0;k2<parts.length;k2++){
+      var colon=parts[k2]===":";
+      txt(c,parts[k2],x,colon?1551:1560,tf,ink(colon?.55:1),"left");
+      if(units[k2]) txt(c,units[k2],x+ws[k2]/2,1587,"500 13px "+FD,ink(.7),"center");
+      x+=ws[k2]+gap;
+    }
+  })();
+
+  c.fillStyle=ink(.45); c.fillRect(ML,1604,MR-ML,1);
+  var day0=ev.startDay+sc.d;
+  var left="2026.11."+day0+"  "+sc.t+"  "+ev.from+(has?"　→　11."+(ev.startDay+fin.d)+"  "+fin.t+"  "+ev.to:"");
+  txt(c,left,ML,1650,"500 17px "+FD,ink(.9),"left","1px");
+  var parts=[];
+  if(d.ranks[0]!=="—"){
+    parts.push("總 "+d.ranks[0].replace(/ /g,""));
+    parts.push((st.group.charAt(0)==="F"?"女子 ":"男子 ")+d.ranks[1].replace(/ /g,""));
+    parts.push(st.group+" "+d.ranks[2].replace(/ /g,""));
+  }
+  if(isFinite(d.avg)) parts.push("均速 "+d.avg.toFixed(1)+" km/h");
+  txt(c,parts.join("　·　"),MR,1650,"500 17px "+FD,ink(.9),"right","1px");
+
+  c.strokeStyle=ink(.5); c.lineWidth=1; c.strokeRect(44.5,44.5,W-89,H-89);
+  grain(c);
+}
+
+/* ---------- 輸出 ---------- */
+var $=function(id){ return document.getElementById(id); };
+var img=$("certImg"), lastBlob=null, lastUrl=null, timer=null, seq=0;
+function fillTable(d){
+  var tb=$("segBody"); tb.innerHTML="";
+  d.rows.forEach(function(r){
+    var tr=document.createElement("tr"), first=document.createElement("td"), b=document.createElement("b");
+    b.textContent=r.prevKm+"–"+r.km+"K"; first.appendChild(b); first.appendChild(document.createTextNode(r.name)); tr.appendChild(first);
+    [fmtT(r.cum),isFinite(r.seg)&&r.seg>0?fmtT(r.seg):"—",isFinite(r.speed)?r.speed.toFixed(1):"—",r.rank].forEach(function(v){ var td=document.createElement("td"); td.textContent=v; tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+}
+function render(){
+  var cv=document.createElement("canvas");
+  cv.width=W*SCALE; cv.height=H*SCALE;
+  var c=cv.getContext("2d"); c.scale(SCALE,SCALE);
+  var d=derive(); draw(c,EV(),ST(),d); fillTable(d);
+  var mine=++seq;
+  cv.toBlob(function(b){
+    if(!b||mine!==seq) return;
+    lastBlob=b;
+    var u=URL.createObjectURL(b); img.src=u;
+    if(lastUrl) URL.revokeObjectURL(lastUrl);
+    lastUrl=u;
+  },"image/png");
+}
+function schedule(){ clearTimeout(timer); timer=setTimeout(function(){ persist(); render(); },240); }
+
+/* ---------- 表單 ---------- */
+function groupLabel(g){ return (g.charAt(0)==="F"?"女子組 ":"男子組 ")+g; }
+function buildForm(){
+  var ev=EV(), st=ST(), data=DATA[state.ev];
+  var groups=data?Array.from(new Set(data.map(function(r){return r.g;}))).sort(function(a,b){ return (a.charAt(0)===b.charAt(0))?(a<b?-1:1):(a.charAt(0)==="M"?-1:1); }):(st.group?[st.group]:[]);
+  if(!st.group&&groups.length) st.group=groups.indexOf("M40")>=0?"M40":groups[0];
+  $("fGroup").innerHTML=groups.map(function(g){ return '<option value="'+g+'">'+groupLabel(g)+'</option>'; }).join("");
+  $("fGroup").value=st.group; $("fName").value=state.name; $("fBib").value=st.bib; $("fStart").value=st.start; $("fPool").value=st.pool;
+  $("fStart").placeholder=ev.start;
+  $("cpGrid").innerHTML=ev.cps.map(function(cp,i){
+    return '<div class="k"><b>'+cp.km+'K</b><small>'+cp.name+'</small></div><input type="text" class="num" id="fCum'+i+'" aria-label="'+cp.km+'K 累計時間" placeholder="00:00:00" autocomplete="off">';
+  }).join("");
+  ev.cps.forEach(function(cp,i){
+    var el=$("fCum"+i); el.value=st.cum[i];
+    el.addEventListener("input",function(){ var s=ST(); s.cum[i]=el.value; s.official=false; s.touched=true; schedule(); });
+  });
+  document.querySelectorAll("nav.events a").forEach(function(a){ if(a.dataset.ev===state.ev) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  document.title=ev.name+" "+ev.km+" 完騎證書";
+}
+$("fName").addEventListener("input",function(e){ state.name=e.target.value; schedule(); });
+$("fBib").addEventListener("input",function(e){ ST().bib=e.target.value; schedule(); });
+$("fGroup").addEventListener("change",function(e){ ST().group=e.target.value; schedule(); });
+$("fStart").addEventListener("input",function(e){ ST().start=e.target.value; schedule(); });
+$("fPool").addEventListener("change",function(e){ ST().pool=e.target.value; schedule(); });
+
+/* ---------- 成績資料 ---------- */
+function info(){
+  var data=DATA[state.ev], ev=EV(), n=ev.cps.length;
+  if(!data){ $("dataInfo").textContent="成績資料載入中…"; return; }
+  var fin=data.filter(function(r){ return r.c[n-1]!=null; }).length;
+  $("dataInfo").textContent=ev.name+" "+ev.km+"：共 "+data.length+" 位有紀錄，"+fin+" 位完賽。";
+}
+function seedExample(k){
+  /* 第一次打開時放一筆中位數完賽者的時間當範例，不帶姓名與號碼 */
+  var st=state.per[k], ev=EVENTS[k], data=DATA[k], n=ev.cps.length;
+  if(st.touched||st.cum.some(function(v){return v;})) return;
+  var full=data.filter(function(r){ return r.c.indexOf(null)<0; }).sort(function(a,b){ return a.c[n-1]-b.c[n-1]; });
+  if(!full.length) return;
+  var m=full[Math.floor(full.length/2)];
+  st.cum=m.c.map(fmtT); st.group=m.g; st.official=false;
+}
+function load(k){
+  if(DATA[k]) return Promise.resolve();
+  return fetch(EVENTS[k].file).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(rows){
+    var n=EVENTS[k].cps.length;
+    DATA[k]=rows.map(function(a){ return {b:a[0],n:a[1],g:a[2],st:a[3],c:a.slice(4,4+n)}; });
+    seedExample(k);
+  });
+}
+function show(k){
+  state.ev=k; persist(); $("hits").innerHTML=""; $("q").value=""; $("gpxStatus").textContent="";
+  buildForm(); info(); render();
+  load(k).then(function(){ if(state.ev!==k) return; buildForm(); info(); render(); })
+    .catch(function(){ if(state.ev===k) $("dataInfo").textContent="成績資料沒載到，名次暫時算不出來。重新整理再試一次。"; });
+}
+function pick(r){
+  var st=ST();
+  st.official=true; st.touched=true; st.bib=String(r.b); st.group=r.g; state.name=r.n;
+  st.start=r.st?r.st.slice(6,11):EV().start;
+  st.cum=r.c.map(function(v){ return v==null?"":fmtT(v); });
+  buildForm(); persist(); render();
+  $("hits").innerHTML=""; $("q").value="";
+  $("dataInfo").textContent="已帶入 "+r.b+" "+r.n+" 的成績。姓名中間字請自己補上。";
+}
+function search(){
+  var q=$("q").value.trim(), box=$("hits"), data=DATA[state.ev], n=EV().cps.length;
+  box.innerHTML="";
+  if(!data||!q) return;
+  var hits;
+  if(/^\d+$/.test(q)){
+    var num=String(parseInt(q,10));
+    hits=data.filter(function(r){ return String(r.b).indexOf(num)===0; });
+  }else{
+    var ch=Array.from(q), a=ch[0], z=ch[ch.length-1];
+    hits=data.filter(function(r){ var m=Array.from(r.n); return m[0]===a&&(ch.length===1||m[m.length-1]===z); });
+  }
+  if(!hits.length){ var p=document.createElement("p"); p.className="hint"; p.textContent="找不到。號碼貼掉了的話，往下用 GPX 推算。"; box.appendChild(p); return; }
+  hits.slice(0,8).forEach(function(r){
+    var b=document.createElement("button"); b.type="button"; b.className="hit";
+    [[String(r.b),"span","n"],[r.n,"span",""],[r.g,"small",""],[r.c[n-1]!=null?fmtT(r.c[n-1]):"未完賽","small",""]].forEach(function(t){ var s=document.createElement(t[1]); if(t[2]) s.className=t[2]; s.textContent=t[0]; b.appendChild(s); });
+    b.addEventListener("click",function(){ pick(r); });
+    box.appendChild(b);
+  });
+  if(hits.length>8){ var more=document.createElement("p"); more.className="hint"; more.textContent="還有 "+(hits.length-8)+" 筆，多打幾個字縮小範圍。"; box.appendChild(more); }
+}
+$("q").addEventListener("input",search);
+
+/* ---------- GPX ---------- */
+function hav(a,b,c,d){
+  var R=6371,r=Math.PI/180,x=(d-b)*r*Math.cos((a+c)/2*r),y=(c-a)*r;
+  return Math.sqrt(x*x+y*y)*R;
+}
+function say(msg,err){ var el=$("gpxStatus"); el.textContent=msg; el.className="status"+(err?" err":""); }
+$("gpxFile").addEventListener("change",function(e){
+  var f=e.target.files&&e.target.files[0]; if(!f) return;
+  say("讀取中…");
+  var rd=new FileReader();
+  rd.onerror=function(){ say("檔案讀不出來，換一份再試。",true); };
+  rd.onload=function(){
+    try{
+      var ev=EV(), st=ST();
+      var doc=new DOMParser().parseFromString(String(rd.result),"application/xml");
+      var nodes=doc.getElementsByTagName("trkpt"), pts=[], i;
+      for(i=0;i<nodes.length;i++){
+        var tn=nodes[i].getElementsByTagName("time")[0];
+        if(!tn) continue;
+        var t=Date.parse(tn.textContent);
+        if(isNaN(t)) continue;
+        pts.push([parseFloat(nodes[i].getAttribute("lat")),parseFloat(nodes[i].getAttribute("lon")),t/1000]);
+      }
+      if(pts.length<50){ say("這份 GPX 沒有帶時間的軌跡點。請用車錶或 Strava 匯出的原始活動檔。",true); return; }
+      var from=0, idxs=[], far=[];
+      ev.cps.forEach(function(cp){
+        var best=-1,bd=1e9;
+        for(var j=from;j<pts.length;j++){ var dd=hav(cp.at[0],cp.at[1],pts[j][0],pts[j][1]); if(dd<bd){bd=dd;best=j;} }
+        idxs.push(best); if(bd>3) far.push(cp.km+"K");
+        if(best>=0) from=best;
+      });
+      var s0=0;
+      for(i=0;i<idxs[0];i++){ if(hav(ev.startPt[0],ev.startPt[1],pts[i][0],pts[i][1])<0.25) s0=i; }
+      var t0=pts[s0][2];
+      idxs.forEach(function(ix,k){ st.cum[k]=fmtT(pts[ix][2]-t0); });
+      var loc=new Date(t0*1000+8*3600*1000);
+      st.start=pad(loc.getUTCHours())+":"+pad(loc.getUTCMinutes());
+      st.official=false; st.touched=true;
+      buildForm(); persist(); render();
+      say(far.length?("已推算，但軌跡離 "+far.join("、")+" 的估計位置超過 3 公里，這幾點請自己核對。"):"已依 GPX 推算各點時間，名次也重排了。",far.length>0);
+    }catch(err){ say("這份檔案解析失敗，確認它是 GPX 格式。",true); }
+  };
+  rd.readAsText(f);
+});
+
+/* ---------- 下載 ---------- */
+var dlCap=null;
+if(window.claude&&typeof window.claude.use==="function"){ window.claude.use("downloads").then(function(d){ dlCap=d; }).catch(function(){}); }
+$("saveBtn").addEventListener("click",function(){
+  if(!lastBlob) return;
+  var name="TBA"+EV().km+"-完騎證書-A4.png", hint=$("saveHint");
+  if(dlCap){
+    dlCap.save({filename:name,data:lastBlob}).then(function(){ hint.textContent="已存好。A4、300 dpi。"; })
+      .catch(function(err){ hint.textContent=(err&&err.code)==="declined"?"沒有儲存。要的話再按一次，或長按圖片存。":"這裡沒辦法直接下載，長按圖片存。"; });
+    return;
+  }
+  var a=document.createElement("a"); a.href=lastUrl; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+});
+
+/* ---------- 起跑 ---------- */
+function fromHash(){ var m=/^#e(620|520|360)$/.exec(location.hash); return m?m[1]:null; }
+window.addEventListener("hashchange",function(){ var k=fromHash(); if(k&&k!==state.ev) show(k); });
+document.querySelectorAll("nav.events a").forEach(function(a){ a.addEventListener("click",function(e){ e.preventDefault(); if(a.dataset.ev!==state.ev) show(a.dataset.ev); try{ history.replaceState(null,"","#e"+a.dataset.ev); }catch(err){ location.hash="e"+a.dataset.ev; } }); });
+show(fromHash()||state.ev);
+if(document.fonts&&document.fonts.load){
+  var sample="完騎證書茲證明時間分秒四極燈塔一日雙北高福隆富貴角三貂國聖港鵝鑾鼻八里雄左營新竹香山王功布袋東起點總男女子均速你的名字"+state.name;
+  var jobs=["900 40px 'Noto Serif TC'","700 40px 'Noto Serif TC'","500 40px 'Noto Serif TC'","600 40px 'Bodoni Moda'","500 40px 'Bodoni Moda'","italic 500 40px 'Bodoni Moda'"]
+    .map(function(f){ return document.fonts.load(f,sample+"0123456789:/.KMTBAkmh").catch(function(){}); });
+  Promise.race([Promise.all(jobs),new Promise(function(r){ setTimeout(r,5000); })]).then(render);
+  if(document.fonts.addEventListener) document.fonts.addEventListener("loadingdone",function(){ clearTimeout(timer); timer=setTimeout(render,300); });
+}
+})();
+</script>
+</body>
+</html>
