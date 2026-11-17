@@ -404,7 +404,7 @@ function draw(c,ev,st,d){
 
   /* 大字：直排在島的西北與東南外海，各有一部分伸到島底下。被島蓋住的裁掉，露出來的帶高斯柔焦與透明 */
   (function(){
-    var COLS=[[340,[455,745]],[680,[905,1185]]], BS=290, bk=BS/200, SIG=6, OP=0.42;
+    var COLS=[[340,[455,745]],[680,[905,1185]]], BS=290, bk=BS/200, SIG=7.5, OP=0.42;
     COLS.forEach(function(col,ci){
       var cxc=col[0], pad=Math.ceil(SIG*3.2), x0=Math.round(cxc-BS/2-pad), y0=Math.round(col[1][0]-BS/2-pad);
       var wU=BS+2*pad, hU=(col[1][1]+BS/2+pad)-y0, w=Math.round(wU*SCALE), h=Math.round(hU*SCALE);
