@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* 跟證書同一套語言：夜空藏青、紙白的字、晨昏色帶當分隔、細線取代框。左證書右工具，手機疊成一欄。 */
+  /* 跟證書同一套語言：夜空藏青、紙白的字、細線取代框。左證書右工具，手機疊成一欄。 */
   --night:#0b1030;
   --deep:#101742;
   --ink:#f4efe4;
@@ -27,7 +27,7 @@ html{background:var(--night)}
 body{background:linear-gradient(180deg,var(--night),var(--deep) 45%,var(--night));min-height:100vh;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:16px;line-height:1.75;-webkit-text-size-adjust:100%}
 a{color:var(--ink)}
 .wrap{max-width:1160px;margin:0 auto;padding:0 20px 72px}
-header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px 40px;padding:44px 0 26px}
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px 40px;padding:44px 0 26px;border-bottom:1px solid var(--hair)}
 .brand{display:flex;flex-direction:column;gap:2px}
 .eyebrow{font-size:13px;letter-spacing:.5em;color:var(--mute)}
 h1{font-weight:900;font-size:44px;letter-spacing:.32em;line-height:1.25;margin:0;text-wrap:balance}
@@ -37,8 +37,6 @@ nav.events a{text-decoration:none;color:var(--mute);padding:6px 0;border-bottom:
 nav.events a b{font-family:var(--f-num);font-weight:600;font-size:1.15em;letter-spacing:.02em;margin-left:.35em}
 nav.events a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
 nav.events a:hover{color:var(--ink)}
-/* 晨昏色帶 */
-.horizon{height:34px;margin:0 -20px;background:linear-gradient(180deg,rgba(11,16,48,0),#3a2f6e 22%,#b3507a 40%,#f58f5a 56%,#fbd08c 70%,#b3507a 84%,rgba(16,23,66,0))}
 .grid{display:grid;grid-template-columns:minmax(0,540px) minmax(0,1fr);gap:48px;align-items:start;padding-top:40px}
 @media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr);gap:36px}h1{font-size:34px}}
 .stage{display:flex;flex-direction:column;gap:16px;position:sticky;top:20px}
@@ -100,7 +98,6 @@ footer{margin-top:40px;padding-top:22px;border-top:1px solid var(--hair);font-si
       <a href="#e360" data-ev="360">一日北高<b>360</b></a>
     </nav>
   </header>
-  <div class="horizon" aria-hidden="true"></div>
 
   <div class="grid">
     <div class="stage">
